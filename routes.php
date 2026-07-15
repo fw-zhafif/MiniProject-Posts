@@ -1,6 +1,6 @@
 <?php
-return [
-    "/" => "controller/posts.php",
-    "/posts" => "controllers/posts.php"
-];
+    return [
+        "/" => "controllers/index.php",
+        "/posts" => "controllers/posts.php"
+    ];
 ?>
