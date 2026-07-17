@@ -14,9 +14,15 @@
         public function query($query,$params = []) {
             $this->statement = $this->connection->prepare($query);
             $this->statement->execute($params);
-            return $this->statement->fetchAll();
-            
+            return $this;
+        }
 
+        public function get() {
+           return $this->statement->fetchAll();
+        }
+
+        public function find() {
+            return $this->statement->fetch();
         }
     }
 
