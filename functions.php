@@ -12,4 +12,5 @@
         echo "file ini tidak bisa dijangkau";
         die();
     }
+
 ?>

@@ -2,17 +2,15 @@
 
     $config = require "config.php";
     $db = new Database($config['db']);
-    
-    if (! isset($_GET['id'])) {
+    $id = $_GET['id'];
+
+    if (! isset($id)) {
         abort();
     }
 
     $post = $db->query("SELECT * FROM posts WHERE id = :id",
-    ['id' => $_GET['id']]
-    )->find();
+    ['id' => $id]
+    )->findOrFail();
 
-    if ($post === false) {
-        abort();
-    }
     require "views/post.view.php"
 ?>
