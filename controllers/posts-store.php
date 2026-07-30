@@ -1,18 +1,17 @@
 <?php
-    $config = require "config.php";
-    $db = new Database($config['db']);
-    
-    $title = $_POST['title'];
-    $body = $_POST['body'];
+$config = require "config.php";
+$db = new Database($config['db']);
 
-    $db->query("INSERT INTO posts (title,body)
-    VALUES (:title, :body)",
-    [
-        'title' => $title,
-        'body' => $body
-    ]
-    );
+$title = $_POST['title'];
+$body = $_POST['body'];
 
-    header('Location: /posts');
-    die();
-?>
+$db->query("INSERT INTO posts (title,body)
+VALUES (:title, :body)",
+[
+    'title' => $title,
+    'body' => $body
+]
+);
+
+header('Location: /posts');
+die();

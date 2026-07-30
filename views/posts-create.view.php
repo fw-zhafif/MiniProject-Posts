@@ -1,4 +1,4 @@
-<form action="/posts" method="POST">
+<form action="/posts/create" method="POST">
     <label for="">Judul</label>
         <input type="text" name="title">
 

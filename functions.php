@@ -13,4 +13,9 @@
         die();
     }
 
+    function redirect($path) {
+        header("Location:{$path}");
+        die();
+    }
+
 ?>
