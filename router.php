@@ -13,6 +13,7 @@ class Router {
 
     return $this;
     }
+
     public function get($uri, $controller) 
     {
         return $this->add('GET',$uri,$controller);
@@ -38,15 +39,59 @@ class Router {
         return $this->add('PUT',$uri,$controller);
     }
 
-    public function route() {
+    public function route() 
+    {
+        $uri = $this->resolveUri();
+        $method = $this->resolveMethod();
 
+        $route = $this->findRoute($uri,$method);
+
+        if (! $route) {
+        abort();
+        }
+
+       $this->loadController($route);
     }
+
+    private function resolveUri() {
+        $uri = parse_url($_SERVER['REQUEST_URI'])['path'];
+        return $uri;
+    }
+
+    private function resolveMethod() {
+        $method = strtoupper($_SERVER['REQUEST_METHOD']);
+
+        if ($method === 'POST' && isset($_POST['_method'])) 
+        {
+        $method = strtoupper($_POST['_method']);
+        }
+
+        return $method;
+    }
+
+    private function findRoute($uri,$method) {
+        foreach ( $this->routes as $route) 
+        {
+            if ( $route['uri'] === $uri && $route['method'] === $method ) {
+                return $route;  
+            }
+        }
+        return null;
+    }
+
+    private function loadController($route) {
+        require $route['controller'];
+    }
+
+    public static function load($file)
+{
+    $router = new static();
+
+    require $file;
+
+    return $router;
 }
-
-
-    // $routes = require "routes.php";
-    // $uri = parse_url($_SERVER['REQUEST_URI'])['path'];
-    // $method = $_SERVER['REQUEST_METHOD'];
+}
 
     // if(! isset($routes[$method]))  {
     //     abort();
