@@ -7,5 +7,9 @@
 
 <h1>Router berhasil 🎉</h1>
 
+<form method="POST" action="/logout">
+    <button>Logout</button>
+</form>
+
 </body>
 </html>

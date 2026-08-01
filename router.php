@@ -2,16 +2,23 @@
 
 class Router {
     protected $routes = [];
+    protected $currentRoute;
     
     public function add($method, $uri, $controller) 
     {
     $this->routes[] = [
         'uri' => $uri,
         'controller' => $controller,
-        'method' => $method
+        'method' => $method,
+        'middleware' => null
     ];
-
+    $this->currentRoute = array_key_last($this->routes);    
     return $this;
+    }
+
+    public function only($middleware) {
+        $this->routes[$this->currentRoute]['middleware'] = $middleware;
+        return $this;
     }
 
     public function get($uri, $controller) 
@@ -50,7 +57,8 @@ class Router {
         abort();
         }
 
-       $this->loadController($route);
+        $this->runMiddleware($route['middleware']);
+        $this->loadController($route['controller']);
     }
 
     private function resolveUri() {
@@ -79,18 +87,29 @@ class Router {
         return null;
     }
 
-    private function loadController($route) {
-        require $route['controller'];
+    private function runMiddleware($middleware)
+    {
+        if (! $middleware) 
+        {
+            return;
+        }
+        
+        MiddlewareManager::resolve($middleware);
+    }
+
+    private function loadController($controller) {
+        require $controller;
     }
 
     public static function load($file)
-{
-    $router = new static();
+    {
+        $router = new static();
 
-    require $file;
+        require $file;
 
-    return $router;
-}
+        return $router;
+    }
+
 }
 
     // if(! isset($routes[$method]))  {
