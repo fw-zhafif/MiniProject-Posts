@@ -1,7 +1,7 @@
 <?php
 
-$email = $_POST['email'];
-$password = $_POST['password'];
+$email = trim($_POST['email']);
+$password = trim($_POST['password']);
 
 if (
     $email === 'admin@example.com'

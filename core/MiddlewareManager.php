@@ -1,7 +1,7 @@
 <?php
 
 class MiddlewareManager {
-    public static function resolve($middleware)
+    public static function run($middleware)
     {
         $map = self::resolveMiddlewareMap();
 
@@ -16,6 +16,6 @@ class MiddlewareManager {
 
     private static function resolveMiddlewareMap()
     {
-        return require 'MiddlewareMap.php';
+        return require base_path('config/Middleware.php');
     }
 }

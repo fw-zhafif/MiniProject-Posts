@@ -94,11 +94,11 @@ class Router {
             return;
         }
         
-        MiddlewareManager::resolve($middleware);
+        MiddlewareManager::run($middleware);
     }
 
     private function loadController($controller) {
-        require $controller;
+        require base_path($controller);
     }
 
     public static function load($file)
