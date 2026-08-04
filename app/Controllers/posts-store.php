@@ -3,7 +3,7 @@
 $title = trim(Request::input('title'));
 $body  = trim(Request::input('body'));
 
-$errors = new ErrorBag;
+$errors = new ErrorBag();
 
 if (! Validator::required($title)) {
 
@@ -39,15 +39,13 @@ if (! $errors->isEmpty()) {
     redirect('/posts/create');
 }
 
-$config = require "config.php";
-$db = new Database($config['db']);
 
-$db->query("INSERT INTO posts (title,body)
-VALUES (:title, :body)",
-[
-    'title' => $title,
-    'body' => $body
-]
-);
+
+$repository = App::resolve(PostRepository::class);
+
+$repository->create([
+    'title' => $title,  
+    'body'  => $body
+]);
 
 redirect('/posts');

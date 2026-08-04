@@ -24,11 +24,11 @@
         die();
     }
 
-    function old($key) 
+    function old($key)
     {
         global $old;
 
-        return old($key) ?? '';
+        return $old[$key] ?? '';
     }
 
     function error($key)
@@ -40,6 +40,15 @@
         }
 
         return $errors->first($key);
+    }
+
+    function view($path, $attributes = [])
+    {
+        extract($attributes);
+
+        $content = base_path('views/' . $path);
+
+        require base_path('views/layouts/app.php');
     }
 
 ?>

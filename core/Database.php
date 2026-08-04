@@ -31,7 +31,7 @@
 
         public function findOrFail() 
         {
-            $result = $this->statement->fetch();
+            $result = $this->find();
 
             if ($result === false) {
                 abort();
