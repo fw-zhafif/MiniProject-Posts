@@ -12,7 +12,7 @@
 
 <?php require $content; ?>
 
-<?php require base_path('views/partials/footer.php'); ?>
+<?php require base_path('views/partials/foot.php'); ?>
 
 </body>
 

@@ -1,27 +1,26 @@
 <?php
 
-class Validator
+abstract class Validator
 {
-    public static function string($value)
+    protected ErrorBag $errors;
+
+    protected array $attributes;
+
+    public function __construct(array $attributes)
     {
-        if (! is_string($value)) {
-            return false;
+        $this->attributes = $attributes;
+        $this->errors = new ErrorBag();
+    }
+
+    abstract protected function rules();
+
+    protected function fail()
+    {
+        if (! $this->errors->isEmpty()) {
+            throw new ValidationException(
+                $this->errors,
+                $this->attributes
+            );
         }
     }
-
-    public static function required($value)
-    {
-        return trim($value) !== '';
-    }
-
-    public static function min($value, $length)
-    {
-        return mb_strlen(trim($value)) >= $length;
-    }
-
-    public static function max($value, $length)
-    {
-        return mb_strlen(trim($value)) <= $length;
-    }
-    
 }

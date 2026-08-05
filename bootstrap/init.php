@@ -2,13 +2,23 @@
 
 //App
 require base_path('Core/App.php');
+require base_path('Core/ValidatorException.php');
+
+// Controllers
+require base_path('Core/Controller.php');
+require base_path('App/Controllers/HomeController.php');
+require base_path('App/Controllers/PostController.php');
+require base_path('App/Controllers/AuthController.php');
+require base_path('App/Validation/PostValidator.php');
+
 require base_path('Core/Database.php');
 require base_path('App/Repositories/PostRepository.php');
+
 
 //Core
 require base_path('Core/Router.php');
 require base_path('Core/Request.php');
-require base_path('Core/Validator.php');
+require base_path('Core/Rules.php');
 require base_path('Core/ErrorBag.php');
 
 //Middleware

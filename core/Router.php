@@ -97,8 +97,31 @@ class Router {
         MiddlewareManager::run($middleware);
     }
 
-    private function loadController($controller) {
-        require base_path($controller);
+    private function loadController($controller) 
+    {
+        try {
+            if (is_string($controller)) 
+            {
+                require base_path($controller);
+                return;
+            }
+            [$class, $method] = $controller;
+
+            if (! class_exists($class)) 
+            {
+                throw new Exception("Controller {$class} not found.");
+            }
+
+            if (! method_exists($class, $method)) 
+            {
+                throw new Exception("Method {$method} not found in {$class}.");
+            }
+
+            (new $class)->$method();
+
+            } catch (ValidationException $e) {
+                $e->respond();
+            }
     }
 
     public static function load($file)

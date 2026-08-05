@@ -2,25 +2,30 @@
 
 //Public
 
-$router->get('/', 'App/Controllers/index.php');
-$router->get('/posts', 'App/Controllers/posts.php');
-$router->get('/post', 'App/Controllers/post.php');
+$router->get('/', [HomeController::class, 'index']);
+
+$router->get('/posts', [
+    PostController::class,
+    'index'
+]);
+
+$router->get('/post', [PostController::class, 'show']);
 
 //AUTH 
 
-$router->get('/posts/create', 'App/Controllers/posts-create.php')->only('auth');
-$router->get('/post/edit', 'App/Controllers/post-edit.php')->only('auth');
+$router->get('/posts/create', [PostController::class, 'create']);;
+$router->get('/post/edit', [PostController::class, 'edit']);
 
-$router->post('/posts', 'App/Controllers/posts-store.php')->only('auth');
-$router->post('/logout', 'App/Controllers/logout.php')->only('auth');
+$router->post('/posts', [PostController::class, 'store']);
+$router->post('/logout', [AuthController::class, 'logout'])->only('auth');
 
-$router->patch('/post', 'App/Controllers/post-update.php')->only('auth');
+$router->patch('/post', [PostController::class, 'update']);
 
-$router->delete('/post', 'App/Controllers/post-delete.php')->only('auth');
+$router->delete('/post', [PostController::class, 'destroy']);
 
 //GUEST
 
-$router->get('/login', 'App/Controllers/login.php')->only('guest');
-$router->post('/login', 'App/Controllers/login-store.php')->only('guest');
+$router->get('/login', [AuthController::class, 'create'])->only('guest');
+$router->post('/login', [AuthController::class, 'store'])->only('guest');
 
 

@@ -46,9 +46,16 @@
     {
         extract($attributes);
 
-        $content = base_path('views/' . $path);
+        $content = base_path(
+            'views/' . str_replace('.', '/', $path) . '.php'
+        );
 
         require base_path('views/layouts/app.php');
+    }
+    
+    function back()
+    {
+        redirect($_SERVER['HTTP_REFERER'] ?? '/');
     }
 
 ?>
