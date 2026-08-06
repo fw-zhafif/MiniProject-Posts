@@ -1,5 +1,13 @@
 <?php
 
+namespace App\Controllers;
+
+use Core\Controller;
+use Core\Request;
+use Core\ErrorBag;
+use Core\Rules;
+use Flash;  
+
 class AuthController extends Controller 
 {
     public function create()

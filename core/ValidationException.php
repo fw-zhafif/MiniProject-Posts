@@ -1,5 +1,9 @@
 <?php
 
+namespace Core;
+use Exception;
+use Flash;
+
 class ValidationException extends Exception
 {
     public ErrorBag $errors;

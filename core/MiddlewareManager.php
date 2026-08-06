@@ -1,5 +1,8 @@
 <?php
 
+namespace Core;
+use Exception;
+
 class MiddlewareManager {
     public static function run($middleware)
     {

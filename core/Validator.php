@@ -1,5 +1,8 @@
 <?php
 
+namespace Core;
+
+
 abstract class Validator
 {
     protected ErrorBag $errors;
@@ -10,6 +13,17 @@ abstract class Validator
     {
         $this->attributes = $attributes;
         $this->errors = new ErrorBag();
+    }
+    
+    public static function validate(array $attributes)
+    {
+        $validator = new static($attributes);
+
+        $validator->rules();
+
+        $validator->fail();
+
+        return $attributes;
     }
 
     abstract protected function rules();

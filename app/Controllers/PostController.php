@@ -1,17 +1,26 @@
 <?php
 
+namespace App\Controllers;
+
+use Core\Controller;
+use Core\Request;
+use Core\Rules;
+use App\Repositories\PostRepository;
+use App\Validation\PostValidator;
+use App\Services\PostService;
+
 class PostController extends Controller
 {
-    protected PostRepository $posts;
+    protected PostService $service;
 
     public function __construct()
     {
-        $this->posts = $this->resolve(PostRepository::class);
+        $this->service = $this->resolve(PostService::class);
     }
 
     public function index()
     {
-        $posts = $this->posts->all();
+        $posts = $this->service->all();
 
         $this->view('posts.index', [
             'posts' => $posts,
@@ -23,11 +32,7 @@ class PostController extends Controller
     {
         $id = Request::input('id');
 
-        if (! Rules::required($id)) {
-            abort();
-        }
-
-        $post = $this->posts->find($id);
+        $post = $this->service->find($id);
 
         $this->view('posts.show', [
             'post' => $post,
@@ -50,9 +55,7 @@ class PostController extends Controller
         'body'  => trim(Request::input('body'))
         ];
 
-        $data = PostValidator::validate($data);
-
-        $this->posts->create($data);
+        $this->service->create($data);
 
         redirect('/posts');
 
@@ -61,11 +64,7 @@ class PostController extends Controller
     public function edit()
     {
         $id = Request::input('id');
-        $post = $this->posts->find($id);
-
-        if (! $post) {
-            abort();
-        }
+        $post = $this->service->find($id);
 
         $this->view('posts.edit', [
             'post' => $post,
@@ -75,17 +74,14 @@ class PostController extends Controller
 
     public function update()
     {
-        
         $id = Request::input('id');
 
-        $data = [
-        'title' => trim(Request::input('title')),
-        'body'  => trim(Request::input('body'))
+        $attributes = [
+            'title' => trim(Request::input('title')),
+            'body'  => trim(Request::input('body'))
         ];
 
-        $data = PostValidator::validate($data);
-
-        $this->posts->update($id, $data);
+        $this->service->update($id, $attributes);
 
         redirect("/post?id={$id}");
     }
@@ -94,15 +90,9 @@ class PostController extends Controller
     {      
         $id = Request::input('id');
 
-        if (! Rules::required($id)) 
-        {
-            abort();
-        }
-
-        $this->posts->find($id);
-
-        $this->posts->delete($id);;
+        $this->service->destroy($id);
 
         redirect('/posts');
     }
+
 }

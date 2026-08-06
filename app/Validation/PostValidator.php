@@ -1,18 +1,13 @@
 <?php
 
+namespace App\Validation;
+use Core\Validator;
+use Core\Rules;
+use Core\ValidationException;
+use Core\ErrorBag;
+
 class PostValidator extends Validator
 {
-    public static function validate(array $attributes)
-    {
-        $validator = new static($attributes);
-
-        $validator->rules();
-
-        $validator->fail();
-
-        return $attributes;
-    }
-
     protected function rules()
     {
         $title = $this->attributes['title'];

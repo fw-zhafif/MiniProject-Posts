@@ -1,5 +1,9 @@
 <?php
 
+use App\Controllers\PostController;
+use App\Controllers\AuthController;
+use App\Controllers\HomeController;
+
 //Public
 
 $router->get('/', [HomeController::class, 'index']);

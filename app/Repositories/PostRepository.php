@@ -1,5 +1,8 @@
 <?php
 
+namespace App\Repositories;
+use Core\Database;
+
 class PostRepository
 {
     protected Database $db;

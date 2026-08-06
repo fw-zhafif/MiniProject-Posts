@@ -1,5 +1,8 @@
 <?php
 
+namespace Core;
+use Exception;
+
 class Router {
     protected $routes = [];
     protected $currentRoute;
@@ -132,16 +135,4 @@ class Router {
 
         return $router;
     }
-
 }
-
-    // if(! isset($routes[$method]))  {
-    //     abort();
-    // }
-
-    // if(array_key_exists($uri, $routes[$method])) {
-    //     require $routes[$method][$uri];
-    // } else {
-    //     abort();
-    // };
-    

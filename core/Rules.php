@@ -1,5 +1,7 @@
 <?php
 
+namespace Core;
+
 class Rules
 {
     public static function string($value)
