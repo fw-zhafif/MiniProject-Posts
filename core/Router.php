@@ -120,7 +120,8 @@ class Router {
                 throw new Exception("Method {$method} not found in {$class}.");
             }
 
-            (new $class)->$method();
+            $controller = App::resolve($class);
+            $controller->$method();
 
             } catch (ValidationException $e) {
                 $e->respond();

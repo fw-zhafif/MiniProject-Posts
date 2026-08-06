@@ -13,9 +13,9 @@ class PostController extends Controller
 {
     protected PostService $service;
 
-    public function __construct()
+    public function __construct(PostService $service)
     {
-        $this->service = $this->resolve(PostService::class);
+        $this->service = $service;
     }
 
     public function index()

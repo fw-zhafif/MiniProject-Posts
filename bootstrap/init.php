@@ -9,18 +9,25 @@ require base_path('App/Services/PostService.php');
 
 $config = require base_path('config.php');
 
-App::bind(
+App::singleton(
     Database::class,
-    new Database($config['db'])
+    function () use ($config) {
+        return new Database($config['db']);
+    }
 );
 
-App::bind(
-    PostRepository::class,
-    new PostRepository(
-        App::resolve(Database::class)
-));
+// App::bind(
+//     PostRepository::class,
+//     function () {
+//         return new PostRepository(
+//             App::resolve(Database::class)
+//         );
+//     }
+// );
 
-App::bind(
-    PostService::class,
-    new PostService()
-);
+// App::bind(
+//     PostService::class,
+//     function () {
+//         return new PostService();
+//     }
+// );
