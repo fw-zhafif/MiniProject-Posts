@@ -74,4 +74,11 @@ class App
             return static::$instances[$key];
         };
     }
+
+    public static function register($provider)
+    {
+        $provider = new $provider();
+
+        $provider->register();
+    }
 }

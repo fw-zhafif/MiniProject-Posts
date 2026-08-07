@@ -58,4 +58,9 @@
         redirect($_SERVER['HTTP_REFERER'] ?? '/');
     }
 
+    function config($key)
+    {
+        return Core\Config::get($key);
+    }
+
 ?>

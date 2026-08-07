@@ -19,6 +19,6 @@ class MiddlewareManager {
 
     private static function resolveMiddlewareMap()
     {
-        return require base_path('config/Middleware.php');
+        return require base_path('config/middleware.php');
     }
 }

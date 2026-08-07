@@ -1,5 +1,7 @@
 <?php
 use Core\Router;
+use Core\App;
+use Core\Database;
 
 define('BASE_PATH', dirname(__DIR__));
 
@@ -8,6 +10,5 @@ require base_path('bootstrap/autoload.php');
 require base_path('bootstrap/init.php');
 
 session_start();
-
 Router::load(base_path('routes/web.php'))
     ->route();

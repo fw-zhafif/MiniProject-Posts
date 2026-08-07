@@ -67,27 +67,16 @@ class PostRepository
     public function all()
     {
         return $this->db
-            ->query("
-                SELECT *
-                FROM posts
-            ")
-            ->get();
+            ->table('posts')
+            ->all();
     }
 
     public function find($id)
     {
         return $this->db
-            ->query(
-                "
-                SELECT *
-                FROM posts
-                WHERE id = :id
-                ",
-                [
-                    'id' => $id
-                ]
-            )
-            ->findOrFail();
+        ->table('posts')
+        ->where('id', '=', $id)
+        ->first();
     }
 
 

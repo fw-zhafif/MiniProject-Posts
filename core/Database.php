@@ -1,12 +1,16 @@
 <?php
-
     namespace Core;
+
     use PDO;
 
     class Database 
     {
         private $connection;
         private $statement;
+
+        protected string $table;
+        protected array $wheres = [];
+        protected array $bindings = [];
 
         public function __construct($config, $username = 'root', $password = '') 
         {
@@ -22,26 +26,106 @@
             return $this;
         }
 
-        public function get() 
+        public function find($id)
         {
-           return $this->statement->fetchAll();
+            return $this
+                ->where('id', '=', $id)
+                ->first();
         }
 
-        public function find() 
+        public function findOrFail($id) 
         {
-            return $this->statement->fetch();
-        }
-
-        public function findOrFail() 
-        {
-            $result = $this->find();
+            $result = $this->find($id);
 
             if ($result === false) {
-                abort();
+                throw new \Exception("Record not found.");
             }
             
             return $result;
         }
-    }
 
-    ?>
+        protected function fetchAll()
+        {
+            return $this->statement->fetchAll();
+        }
+
+        protected function fetchOne()
+        {
+            return $this->statement->fetch();
+        }
+
+        public function table($table)
+        {
+            $this->table = $table;
+
+            return $this;
+        }
+
+        public function where($column, $operator, $value)
+        {
+            $this->wheres[] = [
+                'column'   => $column,
+                'operator' => $operator,
+                'value'    => $value,
+            ];
+
+            $this->bindings[$column] = $value;
+            return $this;
+        }
+
+        protected function buildWhere()
+        {
+            if (empty($this->wheres)) 
+            {
+                return '';
+            }
+
+            $where = $this->wheres[0];
+
+            return "WHERE {$where['column']} {$where['operator']} :{$where['column']}";
+        }
+
+        protected function buildSelect()
+        {
+            return "
+                SELECT *
+                FROM {$this->table}
+                {$this->buildWhere()}
+            ";
+        }
+
+        protected function reset()
+        {
+            $this->table = '';
+
+            $this->wheres = [];
+
+            $this->bindings = [];
+        }
+
+        public function all()
+        {
+            $sql = $this->buildSelect();
+
+            $this->query($sql, $this->bindings);
+
+            $result = $this->fetchAll();
+
+            $this->reset();
+
+            return $result;
+        }
+        
+        public function first()
+        {
+            $sql = $this->buildSelect();
+
+            $this->query($sql, $this->bindings);
+
+            $result = $this->fetchOne();
+
+            $this->reset();
+
+            return $result;
+        }
+    }
