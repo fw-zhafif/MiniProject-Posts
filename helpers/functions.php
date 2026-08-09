@@ -5,13 +5,17 @@
         return BASE_PATH . DIRECTORY_SEPARATOR . ltrim($path, '/\\');
     }
 
-    function dd($value) {
-        echo "<pre>";
-        var_dump($value);
-        echo "</pre>";
+    function dd(...$values) {
+        echo '<pre>';
 
-    die();
+        foreach ($values as $value) {
+            var_dump($value);
+        }
+
+        echo '</pre>';
+        die();
     }
+
 
     function abort($code = 404) {
         http_response_code($code);

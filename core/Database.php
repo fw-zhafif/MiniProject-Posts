@@ -69,8 +69,7 @@
                 'value'    => $value,
             ];
 
-            $this->bindings[$column] = $value;
-            return $this;
+            return $this;   
         }
 
         protected function buildWhere()
@@ -80,11 +79,18 @@
                 return '';
             }
 
-            $where = $this->wheres[0];
+            $conditions = [];
 
-            return "WHERE {$where['column']} {$where['operator']} :{$where['column']}";
+            foreach ($this->wheres as $index => $where) {
+                $placeholder = "{$where['column']}_{$index}";
+                $this->bindings[$placeholder] = $where['value'];
+                $conditions[] = 
+                "{$where['column']} {$where['operator']} :{$placeholder}";
+            }
+
+            return "WHERE " . implode(' AND ', $conditions);
         }
-
+        
         protected function buildSelect()
         {
             return "
@@ -106,6 +112,11 @@
         public function all()
         {
             $sql = $this->buildSelect();
+            dd(
+        $this->wheres,
+        $this->bindings,
+        $sql
+    );
 
             $this->query($sql, $this->bindings);
 
