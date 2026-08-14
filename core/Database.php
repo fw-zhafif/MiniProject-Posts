@@ -11,6 +11,7 @@
         protected string $table;
         protected array $wheres = [];
         protected array $bindings = [];
+        protected array $orders = [];
 
         public function __construct($config, $username = 'root', $password = '') 
         {
@@ -84,6 +85,7 @@
             foreach ($this->wheres as $index => $where) {
                 $placeholder = "{$where['column']}_{$index}";
                 $this->bindings[$placeholder] = $where['value'];
+
                 $conditions[] = 
                 "{$where['column']} {$where['operator']} :{$placeholder}";
             }
@@ -112,11 +114,7 @@
         public function all()
         {
             $sql = $this->buildSelect();
-            dd(
-        $this->wheres,
-        $this->bindings,
-        $sql
-    );
+               dd($this->buildOrder());
 
             $this->query($sql, $this->bindings);
 
@@ -138,5 +136,31 @@
             $this->reset();
 
             return $result;
+        }
+
+        public function orderBy($column, $direction = 'ASC') 
+        {
+            $this->orders[] = [
+                'column' => $column,
+                'direction' => $direction,
+            ];
+
+            return $this;
+        }
+
+        protected function buildOrder()
+        {
+            if (empty($this->orders)) {
+                return '';
+            }
+
+            $orders = [];
+
+            foreach ($this->orders as $order) {
+                $orders[] =
+                    "{$order['column']} {$order['direction']}";
+            }
+
+            return "ORDER BY " . implode(', ', $orders);
         }
     }

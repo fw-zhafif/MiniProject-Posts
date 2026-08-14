@@ -64,12 +64,13 @@ class PostRepository
         );
     }
 
-    public function all()
+public function all()
 {
     return $this->db
         ->table('posts')
         ->where('id', '>', 1)
         ->where('id', '<', 10)
+        ->orderBy('id', 'DESC')
         ->all();
 }
 
@@ -80,6 +81,4 @@ class PostRepository
         ->where('id', '>', 1)
         ->first();
     }
-
-
 }
