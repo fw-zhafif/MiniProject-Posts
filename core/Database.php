@@ -1,7 +1,8 @@
 <?php
     namespace Core;
 
-    use PDO;
+use Exception;
+use PDO;
 
     class Database 
     {
@@ -12,6 +13,8 @@
         protected array $wheres = [];
         protected array $bindings = [];
         protected array $orders = [];
+        protected ?int $limit = null;
+        protected ?int $offset = null;
 
         public function __construct($config, $username = 'root', $password = '') 
         {
@@ -73,6 +76,17 @@
             return $this;   
         }
 
+        protected function buildSelect()
+        {
+            return "
+                SELECT *
+                FROM {$this->table}
+                {$this->buildWhere()}
+                {$this->buildOrder()}
+                {$this->buildLimit()}
+            ";
+        }
+
         protected function buildWhere()
         {
             if (empty($this->wheres)) 
@@ -92,15 +106,6 @@
 
             return "WHERE " . implode(' AND ', $conditions);
         }
-        
-        protected function buildSelect()
-        {
-            return "
-                SELECT *
-                FROM {$this->table}
-                {$this->buildWhere()}
-            ";
-        }
 
         protected function reset()
         {
@@ -114,7 +119,6 @@
         public function all()
         {
             $sql = $this->buildSelect();
-               dd($this->buildOrder());
 
             $this->query($sql, $this->bindings);
 
@@ -139,7 +143,17 @@
         }
 
         public function orderBy($column, $direction = 'ASC') 
-        {
+        {   
+            $direction = strtoupper($direction);
+
+            if (! in_array($direction, ['ASC', 'DESC'])) {
+                throw new Exception("Invalid order direction");
+            }
+            
+            if (! preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $column)) {
+                throw new Exception("Invalid order column");
+            }
+
             $this->orders[] = [
                 'column' => $column,
                 'direction' => $direction,
@@ -162,5 +176,32 @@
             }
 
             return "ORDER BY " . implode(', ', $orders);
+        }
+
+        public function limit($limit) 
+        {
+            if (! is_int($limit) || $limit < 0) {
+                throw new Exception("limit invalid");
+            }
+
+            $this->limit = $limit;
+            return $this;
+        }
+
+        public function offset($offset) {
+           if (! is_int($offset) || $offset < 0) {
+                throw new Exception("limit invalid");
+            }
+            
+            $this->offset = $offset;
+            return $this;
+        }
+
+        public function buildLimit() {
+            if ($this->limit === null) {
+                return '';
+            }
+
+            return "LIMIT {$this->limit}";
         }
     }

@@ -71,6 +71,7 @@ public function all()
         ->where('id', '>', 1)
         ->where('id', '<', 10)
         ->orderBy('id', 'DESC')
+        ->offset(0)
         ->all();
 }
 
