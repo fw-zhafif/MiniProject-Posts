@@ -64,16 +64,14 @@ class PostRepository
         );
     }
 
-public function all()
-{
-    return $this->db
+    public function all()
+    {
+        return $this->db
         ->table('posts')
-        ->where('id', '>', 1)
-        ->where('id', '<', 10)
-        ->orderBy('id', 'DESC')
-        ->offset(0)
+        ->where('id', '>', 5)
+        ->orWhere('title', '=', 'ayam')
         ->all();
-}
+    }
 
     public function find($id)
     {

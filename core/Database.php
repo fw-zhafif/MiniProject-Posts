@@ -9,18 +9,23 @@ use PDO;
         private $connection;
         private $statement;
 
-        protected string $table;
+        protected string $table = '';
         protected array $wheres = [];
         protected array $bindings = [];
         protected array $orders = [];
+        protected array $columns = ['*'];
         protected ?int $limit = null;
         protected ?int $offset = null;
+        protected bool $distinct = false;
+        
 
         public function __construct($config, $username = 'root', $password = '') 
         {
             $dsn = 'mysql:' . http_build_query($config,'',';');
 
-            $this->connection = new PDO($dsn, $username,$password);
+            $this->connection = new PDO($dsn, $username,$password, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            ]);
         }
 
         public function query($query,$params = []) 
@@ -60,6 +65,10 @@ use PDO;
 
         public function table($table)
         {
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $table)) {
+            throw new Exception('Invalid table name');
+            }
+
             $this->table = $table;
 
             return $this;
@@ -67,23 +76,50 @@ use PDO;
 
         public function where($column, $operator, $value)
         {
+            $allowedOperators = [
+                '=',
+                '!=',
+                '<>',
+                '<',
+                '>',
+                '<=',
+                '>=',
+            ];
+
+            if (!in_array($operator, $allowedOperators, true)) {
+                throw new Exception('Invalid operator');
+            }
+
             $this->wheres[] = [
                 'column'   => $column,
                 'operator' => $operator,
                 'value'    => $value,
+                'boolean' => 'AND',
             ];
+            return $this;   
+        }
 
+        public function orWhere($column, $operator, $value) 
+        {
+            $this->wheres[] = [
+                'column'   => $column,
+                'operator' => $operator,
+                'value'    => $value,
+                'boolean' => 'OR',
+            ];
+            
             return $this;   
         }
 
         protected function buildSelect()
         {
             return "
-                SELECT *
+                SELECT {$this->buildColumns()}
                 FROM {$this->table}
                 {$this->buildWhere()}
                 {$this->buildOrder()}
                 {$this->buildLimit()}
+                {$this->buildOffset()}
             ";
         }
 
@@ -98,13 +134,19 @@ use PDO;
 
             foreach ($this->wheres as $index => $where) {
                 $placeholder = "{$where['column']}_{$index}";
-                $this->bindings[$placeholder] = $where['value'];
 
-                $conditions[] = 
-                "{$where['column']} {$where['operator']} :{$placeholder}";
+                $this->bindings[$placeholder] = $where['value'];
+                
+                $condition = "{$where['column']} {$where['operator']} :{$placeholder}";
+
+                if ($index > 0) {
+                    $condition = "{$where['boolean']} " . $condition;
+                }
+
+                $conditions [] = $condition;
             }
 
-            return "WHERE " . implode(' AND ', $conditions);
+            return "WHERE " . implode(' ', $conditions);
         }
 
         protected function reset()
@@ -114,6 +156,16 @@ use PDO;
             $this->wheres = [];
 
             $this->bindings = [];
+
+            $this->orders = [];
+
+            $this->columns = ['*'];
+
+            $this->limit = null;
+
+            $this->offset = null;
+
+            $this->distinct = false;
         }
 
         public function all()
@@ -142,6 +194,29 @@ use PDO;
             return $result;
         }
 
+        public function select(...$columns) 
+        {
+
+            if (empty($columns)) {
+                throw new Exception('At least one column is required');
+            }
+
+            if (in_array('*', $columns) && count($columns) > 1) {
+                throw new Exception('Cannot combine * with other columns');
+            }
+
+            foreach ($columns as $column) {
+                if (
+                    $column != '*' &&
+                    ! preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $column)
+                    ){
+                        throw new Exception('invalid columns');
+                    }
+            }
+            $this->columns = $columns;
+
+            return $this;
+        }
         public function orderBy($column, $direction = 'ASC') 
         {   
             $direction = strtoupper($direction);
@@ -188,20 +263,46 @@ use PDO;
             return $this;
         }
 
+        protected function buildLimit() {
+            if ($this->limit === null) {
+                return '';
+            }
+
+            return "LIMIT {$this->limit}";
+        }
+
         public function offset($offset) {
            if (! is_int($offset) || $offset < 0) {
-                throw new Exception("limit invalid");
+                throw new Exception("offset invalid");
             }
             
             $this->offset = $offset;
             return $this;
         }
 
-        public function buildLimit() {
-            if ($this->limit === null) {
+        protected function buildOffset() 
+        {
+            if ($this->offset === null) {
                 return '';
             }
 
-            return "LIMIT {$this->limit}";
+            return "OFFSET {$this->offset}";
+        }
+
+        protected function buildColumns() 
+        {
+            $columns = implode(', ', $this->columns);
+
+            if ($this->distinct) {
+                $columns = 'DISTINCT ' . $columns;
+            }
+
+            return $columns;
+        }
+
+        public function distinct() {
+            $this->distinct = true;
+
+            return $this;
         }
     }
